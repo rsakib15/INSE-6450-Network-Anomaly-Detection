@@ -1,0 +1,57 @@
+Attack,Feature,Importance
+Bot,Bwd Packet Length Mean,0.10506554363677303
+Bot,Average Packet Size,0.08381646972291308
+Bot,Init_Win_bytes_forward,0.06746359547428217
+Bot,Subflow Bwd Bytes,0.05793398625021042
+DDoS,Bwd Packet Length Mean,0.11743697628383669
+DDoS,Bwd Packet Length Std,0.07500659192541007
+DDoS,Max Packet Length,0.0600949177459366
+DDoS,Bwd Packet Length Max,0.05251901596353626
+DoS_GoldenEye,Bwd Packet Length Std,0.09864260900961427
+DoS_GoldenEye,Flow IAT Max,0.07196095524791378
+DoS_GoldenEye,Flow IAT Mean,0.06449305106955606
+DoS_GoldenEye,Bwd Packet Length Max,0.06017587047875889
+DoS_Hulk,Bwd Packet Length Std,0.08786304156591894
+DoS_Hulk,Fwd IAT Std,0.08515576551369791
+DoS_Hulk,Bwd Packet Length Max,0.0804572488940092
+DoS_Hulk,Bwd Packet Length Mean,0.07416287829372079
+DoS_Slowhttptest,Fwd IAT Max,0.12957624590989936
+DoS_Slowhttptest,Flow Packets/s,0.08147546923944984
+DoS_Slowhttptest,Fwd IAT Std,0.07547907437609841
+DoS_Slowhttptest,Flow IAT Mean,0.06874479779687151
+DoS_slowloris,Bwd Packet Length Mean,0.11210592091427202
+DoS_slowloris,Fwd IAT Mean,0.07198148734060791
+DoS_slowloris,Total Length of Bwd Packets,0.06695029632866596
+DoS_slowloris,Flow Packets/s,0.06032821263150791
+FTP_Patator,Average Packet Size,0.1361480339559839
+FTP_Patator,Fwd Packet Length Std,0.10323068826159017
+FTP_Patator,Max Packet Length,0.07584492304527138
+FTP_Patator,Fwd Packet Length Mean,0.07272215990426827
+Heartbleed,Subflow Fwd Bytes,0.13333333333333333
+Heartbleed,Fwd Header Length.1,0.1
+Heartbleed,Bwd Packet Length Mean,0.1
+Heartbleed,Total Length of Fwd Packets,0.06666666666666667
+Infiltration,Fwd Packet Length Mean,0.11001582396812902
+Infiltration,Subflow Fwd Bytes,0.07719986358959095
+Infiltration,Total Length of Fwd Packets,0.0686742917482084
+Infiltration,Subflow Bwd Packets,0.06450739148859348
+PortScan,Subflow Fwd Bytes,0.11135321330299917
+PortScan,Fwd Packet Length Mean,0.0959911314166961
+PortScan,Fwd IAT Max,0.07797787956329513
+PortScan,Total Length of Fwd Packets,0.07536861222879289
+SSH_Patator,Init_Win_bytes_backward,0.13065483343468015
+SSH_Patator,Init_Win_bytes_forward,0.07418165357407408
+SSH_Patator,Packet Length Mean,0.05842560788006859
+SSH_Patator,Flow Bytes/s,0.05593843303857068
+Web_Attack_�_Brute_Force,Average Packet Size,0.12002490043365693
+Web_Attack_�_Brute_Force,Init_Win_bytes_backward,0.09944187358727401
+Web_Attack_�_Brute_Force,Fwd IAT Std,0.07238794496406735
+Web_Attack_�_Brute_Force,Fwd IAT Min,0.052509080744298185
+Web_Attack_�_Sql_Injection,Init_Win_bytes_backward,0.17593626252402225
+Web_Attack_�_Sql_Injection,Init_Win_bytes_forward,0.05633343564156233
+Web_Attack_�_Sql_Injection,Fwd Packet Length Mean,0.05126720407853314
+Web_Attack_�_Sql_Injection,Flow IAT Min,0.04117164679906357
+Web_Attack_�_XSS,Average Packet Size,0.14673298631294338
+Web_Attack_�_XSS,Init_Win_bytes_backward,0.11042309228211553
+Web_Attack_�_XSS,Fwd IAT Std,0.07322991949041183
+Web_Attack_�_XSS,Subflow Fwd Bytes,0.04589911040175991
