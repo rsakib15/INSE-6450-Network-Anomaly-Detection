@@ -1,0 +1,15 @@
+Attack,Attack_rows,Benign_rows,Total,File
+Bot,1966,4587,6553,Bot.csv
+DDoS,128027,298729,426756,DDoS.csv
+DoS GoldenEye,10293,24017,34310,DoS_GoldenEye.csv
+DoS Hulk,231073,539170,770243,DoS_Hulk.csv
+DoS Slowhttptest,5499,12831,18330,DoS_Slowhttptest.csv
+DoS slowloris,5796,13524,19320,DoS_slowloris.csv
+FTP-Patator,7938,18522,26460,FTP_Patator.csv
+Heartbleed,11,25,36,Heartbleed.csv
+Infiltration,36,84,120,Infiltration.csv
+PortScan,158930,370836,529766,PortScan.csv
+SSH-Patator,5897,13759,19656,SSH_Patator.csv
+Web Attack � Brute Force,1507,3516,5023,Web_Attack_�_Brute_Force.csv
+Web Attack � Sql Injection,21,49,70,Web_Attack_�_Sql_Injection.csv
+Web Attack � XSS,652,1521,2173,Web_Attack_�_XSS.csv
