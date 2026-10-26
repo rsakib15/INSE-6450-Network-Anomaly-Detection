@@ -1,0 +1,2 @@
+total_train_seconds,n_estimators,max_depth,class_weight,model_disk_mb,n_features
+279.23,100,20,balanced,35.147,77
