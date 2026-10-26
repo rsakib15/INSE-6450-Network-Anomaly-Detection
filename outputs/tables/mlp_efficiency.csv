@@ -1,0 +1,2 @@
+device,epochs_run,total_train_seconds,seconds_per_epoch,n_parameters,model_disk_mb,batch_size,lr,class_weights,best_val_f1
+cpu,15,605.68,40.38,18370,0.075,512,0.001,True,0.9282165956663884

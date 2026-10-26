@@ -1,0 +1,13 @@
+{
+  "seed": 42,
+  "epochs": 30,
+  "batch_size": 512,
+  "lr": 0.001,
+  "hidden1": 128,
+  "hidden2": 64,
+  "dropout": 0.3,
+  "patience": 5,
+  "class_weights": true,
+  "n_features": 77,
+  "device": "cpu"
+}

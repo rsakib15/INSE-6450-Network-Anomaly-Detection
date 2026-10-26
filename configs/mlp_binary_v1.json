@@ -1,0 +1,21 @@
+{
+    "task": "binary_network_anomaly",
+    "seed": 42,
+    "model": "mlp",
+    "hidden1": 128,
+    "hidden2": 64,
+    "dropout": 0.3,
+    "learning_rate": 0.001,
+    "batch_size": 512,
+    "max_epochs": 30,
+    "early_stopping_patience": 5,
+    "optimizer": "adam",
+    "loss": "cross_entropy_class_weighted",
+    "val_size_from_train": 0.15,
+    "test_size_global": 0.20,
+    "scaler": "StandardScaler_fit_on_train_only",
+    "label_mapping": {
+        "BENIGN": 0,
+        "Attack": 1
+    }
+}
