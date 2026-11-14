@@ -13,6 +13,7 @@ An AI-based network intrusion detection system that analyses flow-level network 
 | ------- | -------- |
 | **Milestone 1** | Data cleaning, EDA, class imbalance, feature ranking, stratified train/test split |
 | **Milestone 2** | Model selection, training, evaluation, efficiency metrics, deployment design |
+| **Milestone 3** | Failure analysis, robustness stress tests, monitoring (PSI), adaptation under drift |
 
 **Primary model (Milestone 2):** Random Forest classifier
 **Comparison models:** Random Forest without class weights; MLP (PyTorch) with/without class-weighted loss
@@ -147,6 +148,15 @@ python src/measure_rf_inference.py
 python src/measure_inference.py
 ```
 
+### Milestone 3 — Robustness, monitoring, adaptation
+
+```bash
+# Requires outputs/models/rf_baseline.joblib from Milestone 2
+python src/milestone3_robustness.py
+python src/milestone3_monitoring.py
+python src/milestone3_adaptation.py
+```
+
 ### Recommended full sequence
 
 ```bash
@@ -156,8 +166,10 @@ python src/eda.py
 python src/feature_selection.py
 python src/train_rf_baseline.py
 python src/train_mlp.py
-python src/compare_ablation.py
-PYTHONPATH=src python src/measure_rf_inference.py
+python src/measure_rf_inference.py
+python src/milestone3_robustness.py
+python src/milestone3_monitoring.py
+python src/milestone3_adaptation.py
 ```
 
 ---
@@ -234,14 +246,33 @@ Random seed: **`RANDOM_STATE = 42`**.
 | MLP metrics / curves | `outputs/tables/mlp_*.csv`, `figures/learning_curves.png` |
 | Ablation table | `outputs/tables/ablation_comparison.csv` |
 
+### Milestone 3
+
+| Output | Location |
+| -------- | ---------- |
+| Robustness metrics | `outputs/tables/m3_robustness_metrics.csv` |
+| Failure cases | `outputs/tables/m3_failure_cases.csv` |
+| Robustness / confidence figures | `m3_robustness_curves.png`, `m3_confidence_hist.png` |
+| PSI + monitoring log | `m3_drift_psi.csv`, `m3_monitoring_log.csv` |
+| Drift dashboard | `m3_drift_dashboard.png` |
+| Adaptation metrics | `m3_adaptation_metrics.csv` |
+| Adapted model | `outputs/models/rf_adapted.joblib` |
+| Before/after figure | `m3_adaptation_before_after.png` |
+
 ---
 
-## 8. Model Summary (Milestone 2)
+## Model and System Summary
 
-| Model | Role | Notes |
-| ------- | ------ | -------- |
-| **Random Forest** (`class_weight` ablation) | **Primary** | Best test F1 / precision on tabular CICIDS flows |
-| MLP (PyTorch) | Comparison | Weighted loss raises recall, lowers precision vs unweighted |
+| Item | Choice |
+| ------ | -------- |
+| Task | Binary classification (BENIGN vs Attack) |
+| Primary model | Random Forest (`n_estimators=100`, `max_depth=20`, seed 42) |
+| Why RF | Best test F1/precision on tabular CICIDS flows; simple CPU deploy |
+| Imbalance | Stratified splits; class-weight ablation |
+| Leakage controls | No IP/port/Flow ID features; scaler fit on train only (MLP); test used once |
+| Robustness | Strong in-distribution; brittle to heavy Gaussian noise → monitoring + abstention |
+| Monitoring | Schema, null rate, PSI; alert if mean PSI > 0.2 or null rate > 1% |
+| Adaptation | Full RF retrain on drift; versioned `joblib` artefacts |
 
 **Default RF hyperparameters:** `n_estimators=100`, `max_depth=20`, `random_state=42`.
 
