@@ -205,8 +205,7 @@ INSE-6450-Network-Anomaly-Detection/
 │   ├── measure_inference.py
 │   ├── milestone3_robustness.py     # M3 stress tests
 │   ├── milestone3_monitoring.py     # M3 PSI / dashboard
-│   ├── milestone3_adaptation.py     # M3 drift → retrain
-│   └── milestone4_optimisation.py   # M4 grid / Pareto
+│   ├── milestone3_adaptation.py     # M3 drift → retrainx
 ├── outputs/
 │   ├── figures/
 │   ├── tables/
