@@ -1,0 +1,11 @@
+index,true_label,pred_label,p_attack,confidence,why,mitigation,resolved_after_adaptation
+317606,1,0,0.0,1.0,high-confidence misclassification on clean test,raise abstain threshold / human review / retrain on similar flows,pending_m3_adaptation
+173929,0,1,0.9994627819784987,0.9994627819784987,high-confidence misclassification on clean test,raise abstain threshold / human review / retrain on similar flows,pending_m3_adaptation
+528924,0,1,0.9989866230976344,0.9989866230976344,high-confidence misclassification on clean test,raise abstain threshold / human review / retrain on similar flows,
+499675,0,1,0.9989866230976344,0.9989866230976344,high-confidence misclassification on clean test,raise abstain threshold / human review / retrain on similar flows,
+71193,0,1,0.9984676337282802,0.9984676337282802,high-confidence misclassification on clean test,raise abstain threshold / human review / retrain on similar flows,
+444208,0,1,0.9984676337282802,0.9984676337282802,high-confidence misclassification on clean test,raise abstain threshold / human review / retrain on similar flows,
+137593,0,1,0.9984676337282802,0.9984676337282802,high-confidence misclassification on clean test,raise abstain threshold / human review / retrain on similar flows,
+380267,0,1,0.99840359554548,0.99840359554548,high-confidence misclassification on clean test,raise abstain threshold / human review / retrain on similar flows,
+52789,0,1,0.99840359554548,0.99840359554548,high-confidence misclassification on clean test,raise abstain threshold / human review / retrain on similar flows,
+502818,0,1,0.99840359554548,0.99840359554548,high-confidence misclassification on clean test,raise abstain threshold / human review / retrain on similar flows,
