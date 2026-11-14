@@ -1,38 +1,39 @@
-
 # Network Traffic Anomaly Detection Using Machine Learning
 
 **Course:** INSE 6450: AI in Systems Engineering
 **Semester:** Fall 2026
 
+---
+
 ## 1. Project Overview
 
-An AI-based network intrusion detection system that analyzes network traffic to identify suspicious activity and potential cyberattacks. Machine learning is used to classify network traffic as benign or malicious and distinguish between different attack types.
+An AI-based network intrusion detection system that analyses flow-level network traffic to identify suspicious activity and potential cyberattacks. The system classifies each flow as **benign** or **attack** using supervised machine learning on the **CICIDS2017** dataset.
 
-## Milestones
+| Phase | Focus |
+| ------- | -------- |
+| **Milestone 1** | Data cleaning, EDA, class imbalance, feature ranking, stratified train/test split |
+| **Milestone 2** | Model selection, training, evaluation, efficiency metrics, deployment design |
+| **Milestone 3** | Failure analysis, robustness stress tests, monitoring (PSI), adaptation under drift |
 
-### Milestone 1 Objectives
+**Primary model (Milestone 2):** Random Forest classifier
+**Comparison models:** Random Forest without class weights; MLP (PyTorch) with/without class-weighted loss
 
-- Clean and preprocess the CICIDS2017 dataset.
-- Perform exploratory data analysis (EDA) and investigate class imbalance.
-- Rank feature importance using a Random Forest model.
-- Generate balanced, attack-specific datasets for further experimentation.
-- Produce reproducible outputs, including cleaned CSV files, summary tables, and visualizations.
+---
 
 ## 2. Dataset
 
-This project uses the **CICIDS2017 dataset**, published by the Canadian Institute for Cybersecurity (CIC).
+**CICIDS2017** — Canadian Institute for Cybersecurity (University of New Brunswick)
+Official page: <https://www.unb.ca/cic/datasets/ids-2017.html>
 
-**Official dataset:** <https://www.unb.ca/cic/datasets/ids-2017.html>
+### Setup
 
-### Dataset Setup
-
-Download the CICIDS2017 CSV files and place all eight daily traffic CSV files in the following directory:
+Download the CICIDS2017 **CSV** files and place them in:
 
 ```text
 data/raw/
 ```
 
-Expected files include:
+Typical files:
 
 - `Monday-WorkingHours.pcap_ISCX.csv`
 - `Tuesday-WorkingHours.pcap_ISCX.csv`
@@ -43,28 +44,30 @@ Expected files include:
 - `Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv`
 - `Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv`
 
-*Note: File names may vary slightly depending on the downloaded version.*
+File names may vary slightly by download source. The original dataset is **not** stored in this repository.
 
-The original dataset is not included in this repository. Users must download it separately and place the files in `data/raw/`.
+**Quick test without the full dataset:**
+
+```bash
+python src/create_demo_data.py
+```
+
+---
 
 ## 3. Prerequisites
 
-Ensure the following software is installed:
+- Python **3.10+**
+- `pip`
+- Git (optional)
 
-- Python 3.10 or later
-- pip
-- Git (optional, for cloning the repository)
+---
 
 ## 4. Installation
-
-Clone the repository and navigate to the project directory:
 
 ```bash
 git clone <repository-url>
 cd INSE-6450-Network-Anomaly-Detection
 ```
-
-Create and activate a virtual environment.
 
 **Linux / macOS**
 
@@ -80,81 +83,201 @@ python -m venv venv
 venv\Scripts\activate
 ```
 
-Install the required dependencies:
-
 ```bash
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
+Optional (inference memory measurement):
+
+```bash
+pip install psutil
+```
+
+CPU-only PyTorch (if needed):
+
+```bash
+pip install torch --index-url https://download.pytorch.org/whl/cpu
+```
+
+---
+
 ## 5. How to Run
 
-Run all commands from the project root directory.
+Run **all commands from the project root**. Later steps depend on earlier outputs.
 
-### Step 1: Prepare the Dataset
-
-Place the original CICIDS2017 CSV files in `data/raw/`.
-
-### Step 2: Preprocess the Data
+### Milestone 1 — Data pipeline
 
 ```bash
+# 1) Clean and merge raw CSVs → data/processed/all_data.csv
 python src/preprocessing.py
-```
 
-This step cleans and combines the input CSV files and prepares the processed dataset.
+# 2) Stratified 80/20 split → train.csv, test.csv + split figure
+python src/split_data.py
 
-### Step 3: Perform Exploratory Data Analysis
-
-```bash
+# 3) EDA plots and tables
 python src/eda.py
-```
 
-This step generates descriptive statistics, data-quality summaries, class distributions, and visualizations to help investigate the dataset and its class imbalance.
-
-### Step 4: Analyze Feature Importance
-
-```bash
+# 4) Feature importance + balanced attack subsets
 python src/feature_selection.py
 ```
 
-This step ranks the input features using a Random Forest model and generates feature-importance outputs for further analysis.
+Optional fast preprocessing test:
 
-**Important:** Run the scripts in the order shown above because later stages may depend on outputs produced by earlier stages.
+```bash
+python src/preprocessing.py --quick
+```
+
+### Milestone 2 — Models and evaluation
+
+```bash
+# Primary model: Random Forest
+python src/train_rf_baseline.py
+python src/train_mlp.py
+
+# Optional unweighted MLP ablation
+python src/train_mlp.py --no-class-weights
+# mv outputs/tables/mlp_metrics.csv outputs/tables/mlp_metrics_unweighted.csv
+# python src/train_mlp.py    # re-train weighted as main MLP metrics file
+
+# Merge ablation table (uses rf_comparison.csv when available)
+python src/compare_ablation.py
+python src/measure_rf_inference.py
+
+# Optional MLP inference latency
+python src/measure_inference.py
+```
+
+### Milestone 3 — Robustness, monitoring, adaptation
+
+```bash
+# Requires outputs/models/rf_baseline.joblib from Milestone 2
+python src/milestone3_robustness.py
+python src/milestone3_monitoring.py
+python src/milestone3_adaptation.py
+```
+
+### Recommended full sequence
+
+```bash
+python src/preprocessing.py
+python src/split_data.py
+python src/eda.py
+python src/feature_selection.py
+python src/train_rf_baseline.py
+python src/train_mlp.py
+python src/measure_rf_inference.py
+python src/milestone3_robustness.py
+python src/milestone3_monitoring.py
+python src/milestone3_adaptation.py
+```
+
+---
 
 ## 6. Project Structure
 
 ```text
-INSE-6450-Network-Anomaly-Detection
+INSE-6450-Network-Anomaly-Detection/
 ├── README.md
 ├── requirements.txt
+├── .gitignore
+├── configs/
+│   └── mlp_binary_v1.json
 ├── data/
-│   ├── raw/                  # Original CICIDS2017 CSV files
-│   └── processed/            # Cleaned and processed datasets
-│       └── attacks/          # Attack-specific balanced subsets
+│   ├── raw/                         # CICIDS2017 CSVs (user-provided)
+│   └── processed/
+│       ├── all_data.csv
+│       ├── train.csv
+│       ├── test.csv
+│       └── attacks/
 ├── src/
-│   ├── utils.py              # Shared utility functions
-│   ├── create_demo_data.py   # Demo dataset generation
-│   ├── preprocessing.py      # Data cleaning and preprocessing
-│   ├── eda.py                # Exploratory data analysis
-│   └── feature_selection.py  # Feature-importance analysis
+│   ├── utils.py
+│   ├── create_demo_data.py
+│   ├── preprocessing.py             # M1
+│   ├── split_data.py                # M1
+│   ├── eda.py                       # M1
+│   ├── feature_selection.py         # M1
+│   ├── data_loader.py               # M2+ shared load / split / scaler
+│   ├── train_rf_baseline.py         # M2 primary RF
+│   ├── train_mlp.py                 # M2 MLP comparison
+│   ├── compare_ablation.py
+│   ├── measure_rf_inference.py
+│   ├── measure_inference.py
+│   ├── milestone3_robustness.py     # M3 stress tests
+│   ├── milestone3_monitoring.py     # M3 PSI / dashboard
+│   ├── milestone3_adaptation.py     # M3 drift → retrainx
 ├── outputs/
-│   ├── figures/              # Generated plots and visualizations
-│   └── tables/               # CSV summaries and analysis tables
+│   ├── figures/
+│   ├── tables/
+│   └── models/                      # rf_baseline, rf_adapted, rf_optimised, mlp
 └── reports/
-    └── Milestone1.pdf        # Milestone 1 report
+    ├── Milestone1.pdf
+    ├── Milestone2.pdf
+    └── Milestone3.pdf
 ```
+
+All paths are **relative** to the project root (no hard-coded absolute paths).
+Random seed: **`RANDOM_STATE = 42`**.
+
+---
 
 ## 7. Expected Outputs
 
-After running the scripts successfully, the project produces the following types of artifacts:
+### Milestone 1
 
-| Output | Description |
-| --- | --- |
-| Cleaned dataset | Combined and preprocessed network traffic data |
-| Data-quality summaries | Missing values, duplicates, and other quality checks |
-| Class distribution analysis | Traffic and attack-category distributions |
-| Visualizations | Plots for exploratory data analysis |
-| Feature-importance tables | Ranked features from the Random Forest model |
-| Attack-specific subsets | Balanced datasets for selected attack categories |
+| Output | Location |
+| -------- | ---------- |
+| Cleaned full dataset | `data/processed/all_data.csv` |
+| Train / test split | `data/processed/train.csv`, `test.csv` |
+| Class distribution | `outputs/tables/class_distribution.csv`, `figures/class_distribution.png` |
+| Split figure | `outputs/figures/train_test_split.png` |
+| EDA plots | `flow_duration_hist.png`, `bwd_pkt_len_boxplot.png`, `correlation_heatmap.png` |
+| Feature importance | `outputs/tables/feature_importance_*.csv`, `figures/feature_importance_*.png` |
+| Attack subsets | `data/processed/attacks/*.csv` |
 
-Generated files are stored under `data/processed/` and `outputs/`, according to the implementation of each script.
+### Milestone 2
+
+| Output | Location |
+| -------- | ---------- |
+| Trained Random Forest | `outputs/models/rf_baseline.joblib` |
+| RF metrics (val/test) | `outputs/tables/rf_metrics.csv` |
+| RF learning curve | `outputs/figures/rf_learning_curve.png`, `tables/rf_learning_curve.csv` |
+| RF confusion matrix | `outputs/figures/confusion_matrix_rf.png` |
+| Model comparison | `outputs/tables/rf_comparison.csv`, `figures/rf_comparison_bars.png` |
+| RF train efficiency | `outputs/tables/rf_efficiency.csv` |
+| RF inference efficiency | `outputs/tables/rf_inference_efficiency.csv` |
+| MLP model (optional) | `outputs/models/mlp_binary.pt`, `scaler.joblib` |
+| MLP metrics / curves | `outputs/tables/mlp_*.csv`, `figures/learning_curves.png` |
+| Ablation table | `outputs/tables/ablation_comparison.csv` |
+
+### Milestone 3
+
+| Output | Location |
+| -------- | ---------- |
+| Robustness metrics | `outputs/tables/m3_robustness_metrics.csv` |
+| Failure cases | `outputs/tables/m3_failure_cases.csv` |
+| Robustness / confidence figures | `m3_robustness_curves.png`, `m3_confidence_hist.png` |
+| PSI + monitoring log | `m3_drift_psi.csv`, `m3_monitoring_log.csv` |
+| Drift dashboard | `m3_drift_dashboard.png` |
+| Adaptation metrics | `m3_adaptation_metrics.csv` |
+| Adapted model | `outputs/models/rf_adapted.joblib` |
+| Before/after figure | `m3_adaptation_before_after.png` |
+
+---
+
+## 8. Model and System Summary
+
+| Item | Choice |
+| ------ | -------- |
+| Task | Binary classification (BENIGN vs Attack) |
+| Primary model | Random Forest (`n_estimators=100`, `max_depth=20`, seed 42) |
+| Why RF | Best test F1/precision on tabular CICIDS flows; simple CPU deploy |
+| Imbalance | Stratified splits; class-weight ablation |
+| Leakage controls | No IP/port/Flow ID features; scaler fit on train only (MLP); test used once |
+| Robustness | Strong in-distribution; brittle to heavy Gaussian noise → monitoring + abstention |
+| Monitoring | Schema, null rate, PSI; alert if mean PSI > 0.2 or null rate > 1% |
+| Adaptation | Full RF retrain on drift; versioned `joblib` artefacts |
+
+**Default RF hyperparameters:** `n_estimators=100`, `max_depth=20`, `random_state=42`.
+
+**Split:** stratified 80% train / 20% test; 15% of train held out as validation inside training scripts.

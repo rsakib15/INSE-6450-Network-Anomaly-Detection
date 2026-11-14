@@ -1,0 +1,25 @@
+feature,psi_test_vs_train,batch
+Flow Duration,1.787440525406007e-05,test_natural
+Total Fwd Packets,5.617570730074053e-06,test_natural
+Total Backward Packets,1.154776913113766e-05,test_natural
+Total Length of Fwd Packets,1.1903500909708958e-05,test_natural
+Total Length of Bwd Packets,2.9281239135550486e-05,test_natural
+Fwd Packet Length Max,8.369639969033136e-06,test_natural
+Fwd Packet Length Min,6.178439231099106e-06,test_natural
+Fwd Packet Length Mean,1.2489788419639879e-05,test_natural
+Fwd Packet Length Std,9.683344905648979e-06,test_natural
+Bwd Packet Length Max,1.8130613779639307e-05,test_natural
+Bwd Packet Length Min,1.3111693372653171e-05,test_natural
+Bwd Packet Length Mean,3.0960389674646244e-05,test_natural
+Flow Duration,11.052414893080423,simulated_shift
+Total Fwd Packets,13.276495176551501,simulated_shift
+Total Backward Packets,13.048292398048966,simulated_shift
+Total Length of Fwd Packets,12.57712291745123,simulated_shift
+Total Length of Bwd Packets,12.34882649473828,simulated_shift
+Fwd Packet Length Max,10.809358690908244,simulated_shift
+Fwd Packet Length Min,7.8709279034022215,simulated_shift
+Fwd Packet Length Mean,12.57718162510831,simulated_shift
+Fwd Packet Length Std,11.988805810760345,simulated_shift
+Bwd Packet Length Max,9.69713670883047,simulated_shift
+Bwd Packet Length Min,7.446075893272826,simulated_shift
+Bwd Packet Length Mean,11.235123765690863,simulated_shift
