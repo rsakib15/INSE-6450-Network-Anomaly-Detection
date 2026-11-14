@@ -184,32 +184,37 @@ INSE-6450-Network-Anomaly-Detection/
 ├── configs/
 │   └── mlp_binary_v1.json
 ├── data/
-│   ├── raw/                      # Original CICIDS2017 CSVs (user-provided)
+│   ├── raw/                         # CICIDS2017 CSVs (user-provided)
 │   └── processed/
 │       ├── all_data.csv
 │       ├── train.csv
 │       ├── test.csv
-│       └── attacks/              # Balanced per-attack subsets
+│       └── attacks/
 ├── src/
 │   ├── utils.py
 │   ├── create_demo_data.py
-│   ├── preprocessing.py          # Milestone 1
-│   ├── split_data.py             # Milestone 1
-│   ├── eda.py                    # Milestone 1
-│   ├── feature_selection.py      # Milestone 1
-│   ├── data_loader.py            # Milestone 2 shared loading
-│   ├── train_rf.py      # Milestone 2 primary model
-│   ├── train_mlp.py              # Milestone 2 MLP comparison
+│   ├── preprocessing.py             # M1
+│   ├── split_data.py                # M1
+│   ├── eda.py                       # M1
+│   ├── feature_selection.py         # M1
+│   ├── data_loader.py               # M2+ shared load / split / scaler
+│   ├── train_rf_baseline.py         # M2 primary RF
+│   ├── train_mlp.py                 # M2 MLP comparison
 │   ├── compare_ablation.py
 │   ├── measure_rf_inference.py
-│   └── measure_inference.py
+│   ├── measure_inference.py
+│   ├── milestone3_robustness.py     # M3 stress tests
+│   ├── milestone3_monitoring.py     # M3 PSI / dashboard
+│   ├── milestone3_adaptation.py     # M3 drift → retrain
+│   └── milestone4_optimisation.py   # M4 grid / Pareto
 ├── outputs/
 │   ├── figures/
 │   ├── tables/
-│   └── models/                   # rf_baseline.joblib, mlp_binary.pt, scaler
+│   └── models/                      # rf_baseline, rf_adapted, rf_optimised, mlp
 └── reports/
     ├── Milestone1.pdf
-    └── Milestone2.pdf
+    ├── Milestone2.pdf
+    └── Milestone3.pdf
 ```
 
 All paths are **relative** to the project root (no hard-coded absolute paths).
