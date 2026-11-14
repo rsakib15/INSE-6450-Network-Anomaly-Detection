@@ -1,0 +1,7 @@
+batch_id,n_rows,null_rate,mean_psi_top_features,drift_alert,schema_ok
+0,5000,0.0,0.001203439457491427,False,True
+1,5000,0.0,0.0009818386278544354,False,True
+2,5000,0.0,0.0016477062040812038,False,True
+3,5000,0.0,0.0008725116032897888,False,True
+4,5000,0.0,0.0013708338642402776,False,True
+99,5000,0.15,0.45,True,False
