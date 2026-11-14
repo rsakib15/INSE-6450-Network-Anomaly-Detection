@@ -261,7 +261,7 @@ Random seed: **`RANDOM_STATE = 42`**.
 
 ---
 
-## Model and System Summary
+## 8. Model and System Summary
 
 | Item | Choice |
 | ------ | -------- |
