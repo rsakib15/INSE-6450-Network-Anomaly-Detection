@@ -2,38 +2,42 @@
 
 **Course:** INSE 6450: AI in Systems Engineering
 **Semester:** Fall 2026
+**Team:** Md Sakib Rahman · Daniel Adonteng Sarpong · Karim Al-Sharara
 
 ---
 
 ## 1. Project Overview
 
-An AI-based network intrusion detection system that analyses flow-level network traffic to identify suspicious activity and potential cyberattacks. The system classifies each flow as **benign** or **attack** using supervised machine learning on the **CICIDS2017** dataset.
+Supervised **binary** network anomaly detection on **CICIDS2017** flow features.
+Each flow is classified as **BENIGN** or **Attack** to support SOC alert prioritisation.
 
 | Phase | Focus |
-| ------- | -------- |
-| **Milestone 1** | Data cleaning, EDA, class imbalance, feature ranking, stratified train/test split |
-| **Milestone 2** | Model selection, training, evaluation, efficiency metrics, deployment design |
-| **Milestone 3** | Failure analysis, robustness stress tests, monitoring (PSI), adaptation under drift |
+|-------|--------|
+| **Milestone 1** | Problem definition, cleaning, EDA, imbalance, feature ranking, stratified split |
+| **Milestone 2** | Model selection (RF primary), training, efficiency, deployment design |
+| **Milestone 3** | Failure analysis, robustness tests, PSI monitoring, drift adaptation |
+| **Milestone 4** | Continual learning (replay + RF retrain), HITL / active learning, system integration |
 
-**Primary model (Milestone 2):** Random Forest classifier
-**Comparison models:** Random Forest without class weights; MLP (PyTorch) with/without class-weighted loss
+**Primary model:** Random Forest (`n_estimators=100`, `max_depth=20`, `random_state=42`)
+**Comparison:** RF without class weights; MLP (PyTorch)
+
+### Headline results
+
+| Setting | Result |
+|---------|--------|
+| Clean RF (test) | F1 ≈ **0.996**, PR-AUC ≈ **0.999** |
+| Noise σ=0.1 | F1 ≈ **0.010** (brittleness; mitigations in M3) |
+| Adapted on drift (M3) | F1 **0 → 0.986** |
+| Continual learning (M4) | F1 before=0 → after ≈ **0.985–0.987**; clean stays ≈ **0.992** |
+| Active learning (M4) | F1 **0.956** (2k labels) → **0.992** (6k labels) |
 
 ---
 
 ## 2. Dataset
 
-**CICIDS2017** — Canadian Institute for Cybersecurity (University of New Brunswick)
-Official page: <https://www.unb.ca/cic/datasets/ids-2017.html>
+**CICIDS2017** — [Canadian Institute for Cybersecurity](https://www.unb.ca/cic/datasets/ids-2017.html)
 
-### Setup
-
-Download the CICIDS2017 **CSV** files and place them in:
-
-```text
-data/raw/
-```
-
-Typical files:
+Place CSV files in `data/raw/` (not shipped in this repo):
 
 - `Monday-WorkingHours.pcap_ISCX.csv`
 - `Tuesday-WorkingHours.pcap_ISCX.csv`
@@ -44,9 +48,7 @@ Typical files:
 - `Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv`
 - `Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv`
 
-File names may vary slightly by download source. The original dataset is **not** stored in this repository.
-
-**Quick test without the full dataset:**
+Optional demo data (no full CICIDS download):
 
 ```bash
 python src/create_demo_data.py
@@ -57,8 +59,7 @@ python src/create_demo_data.py
 ## 3. Prerequisites
 
 - Python **3.10+**
-- `pip`
-- Git (optional)
+- `pip`, Git (optional)
 
 ---
 
@@ -67,97 +68,65 @@ python src/create_demo_data.py
 ```bash
 git clone <repository-url>
 cd INSE-6450-Network-Anomaly-Detection
-```
 
-**Linux / macOS**
-
-```bash
 python3 -m venv venv
-source venv/bin/activate
-```
+source venv/bin/activate          # Windows: venv\Scripts\activate
 
-**Windows**
-
-```powershell
-python -m venv venv
-venv\Scripts\activate
-```
-
-```bash
 python -m pip install --upgrade pip
 pip install -r requirements.txt
+pip install psutil                # optional: inference memory
 ```
 
-Optional (inference memory measurement):
-
-```bash
-pip install psutil
-```
-
-CPU-only PyTorch (if needed):
-
-```bash
-pip install torch --index-url https://download.pytorch.org/whl/cpu
-```
+All paths are **relative** to the project root. Seed: **`RANDOM_STATE = 42`**.
 
 ---
 
 ## 5. How to Run
 
-Run **all commands from the project root**. Later steps depend on earlier outputs.
-
-### Milestone 1 — Data pipeline
+### Milestone 1 — Data
 
 ```bash
-# 1) Clean and merge raw CSVs → data/processed/all_data.csv
 python src/preprocessing.py
-
-# 2) Stratified 80/20 split → train.csv, test.csv + split figure
 python src/split_data.py
-
-# 3) EDA plots and tables
 python src/eda.py
-
-# 4) Feature importance + balanced attack subsets
 python src/feature_selection.py
 ```
 
-Optional fast preprocessing test:
+### Milestone 2 — Models
 
 ```bash
-python src/preprocessing.py --quick
-```
-
-### Milestone 2 — Models and evaluation
-
-```bash
-# Primary model: Random Forest
 python src/train_rf_baseline.py
-python src/train_mlp.py
-
-# Optional unweighted MLP ablation
-python src/train_mlp.py --no-class-weights
-# mv outputs/tables/mlp_metrics.csv outputs/tables/mlp_metrics_unweighted.csv
-# python src/train_mlp.py    # re-train weighted as main MLP metrics file
-
-# Merge ablation table (uses rf_comparison.csv when available)
+python src/train_mlp.py                 # optional comparison
 python src/compare_ablation.py
-python src/measure_rf_inference.py
-
-# Optional MLP inference latency
-python src/measure_inference.py
+PYTHONPATH=src python src/measure_rf_inference.py
 ```
 
 ### Milestone 3 — Robustness, monitoring, adaptation
 
 ```bash
-# Requires outputs/models/rf_baseline.joblib from Milestone 2
 python src/milestone3_robustness.py
 python src/milestone3_monitoring.py
 python src/milestone3_adaptation.py
 ```
 
-### Recommended full sequence
+### Milestone 4 — Continual learning & HITL
+
+```bash
+python src/milestone4_continual.py
+python src/milestone4_hitl_active.py
+# optional:
+# python src/milestone4_optimisation.py --quick
+```
+
+### End-to-end demo (final submission)
+
+```bash
+python src/demo_end_to_end.py
+```
+
+**Demo flow:** load → infer → PSI drift detect → uncertainty query (human/oracle) → replay retrain → save artefact.
+
+### Full sequence
 
 ```bash
 python src/preprocessing.py
@@ -165,11 +134,12 @@ python src/split_data.py
 python src/eda.py
 python src/feature_selection.py
 python src/train_rf_baseline.py
-python src/train_mlp.py
-python src/measure_rf_inference.py
 python src/milestone3_robustness.py
 python src/milestone3_monitoring.py
 python src/milestone3_adaptation.py
+python src/milestone4_continual.py
+python src/milestone4_hitl_active.py
+python src/demo_end_to_end.py
 ```
 
 ---
@@ -182,102 +152,93 @@ INSE-6450-Network-Anomaly-Detection/
 ├── requirements.txt
 ├── .gitignore
 ├── configs/
-│   └── mlp_binary_v1.json
 ├── data/
-│   ├── raw/                         # CICIDS2017 CSVs (user-provided)
-│   └── processed/
-│       ├── all_data.csv
-│       ├── train.csv
-│       ├── test.csv
-│       └── attacks/
+│   ├── raw/                 # CICIDS2017 CSVs (user-provided)
+│   └── processed/           # all_data, train, test, attacks/
 ├── src/
 │   ├── utils.py
 │   ├── create_demo_data.py
-│   ├── preprocessing.py             # M1
-│   ├── split_data.py                # M1
-│   ├── eda.py                       # M1
-│   ├── feature_selection.py         # M1
-│   ├── data_loader.py               # M2+ shared load / split / scaler
-│   ├── train_rf_baseline.py         # M2 primary RF
-│   ├── train_mlp.py                 # M2 MLP comparison
+│   ├── preprocessing.py              # M1
+│   ├── split_data.py                 # M1
+│   ├── eda.py                        # M1
+│   ├── feature_selection.py          # M1
+│   ├── data_loader.py                # shared load / split
+│   ├── train_rf_baseline.py          # M2 primary
+│   ├── train_mlp.py                  # M2 comparison
 │   ├── compare_ablation.py
 │   ├── measure_rf_inference.py
 │   ├── measure_inference.py
-│   ├── milestone3_robustness.py     # M3 stress tests
-│   ├── milestone3_monitoring.py     # M3 PSI / dashboard
-│   ├── milestone3_adaptation.py     # M3 drift → retrainx
+│   ├── robustness.py                 # M3
+│   ├── monitoring.py                 # M3
+│   ├── adaptation.py                 # M3
+│   ├── continual.py                  # M4 CL
+│   ├── hitl_active.py                # M4 HITL / AL
+│   ├── optimisation.py               # M4 optional
+│   └── demo_end_to_end.py            # Final E2E demo
 ├── outputs/
 │   ├── figures/
 │   ├── tables/
-│   └── models/                      # rf_baseline, rf_adapted, rf_optimised, mlp
+│   └── models/              # rf_baseline, rf_adapted, rf_continual_final, ...
 └── reports/
-    ├── Milestone1.pdf
-    ├── Milestone2.pdf
-    └── Milestone3.pdf
+    ├── Milestone1–4 (.tex / PDF)
+    └── Final_Bullet_Points.md
 ```
-
-All paths are **relative** to the project root (no hard-coded absolute paths).
-Random seed: **`RANDOM_STATE = 42`**.
 
 ---
 
 ## 7. Expected Outputs
 
-### Milestone 1
+### Models (`outputs/models/`)
 
-| Output | Location |
-| -------- | ---------- |
-| Cleaned full dataset | `data/processed/all_data.csv` |
-| Train / test split | `data/processed/train.csv`, `test.csv` |
-| Class distribution | `outputs/tables/class_distribution.csv`, `figures/class_distribution.png` |
-| Split figure | `outputs/figures/train_test_split.png` |
-| EDA plots | `flow_duration_hist.png`, `bwd_pkt_len_boxplot.png`, `correlation_heatmap.png` |
-| Feature importance | `outputs/tables/feature_importance_*.csv`, `figures/feature_importance_*.png` |
-| Attack subsets | `data/processed/attacks/*.csv` |
+| File | Description |
+|------|-------------|
+| `rf_baseline.joblib` | Milestone 2 primary RF |
+| `rf_adapted.joblib` | M3 drift-adapted RF |
+| `rf_continual_final.joblib` | M4 continual learning final |
+| `rf_demo_updated.joblib` | E2E demo updated model |
+| `mlp_binary.pt` | Optional MLP |
 
-### Milestone 2
+### Key tables & figures
 
-| Output | Location |
-| -------- | ---------- |
-| Trained Random Forest | `outputs/models/rf_baseline.joblib` |
-| RF metrics (val/test) | `outputs/tables/rf_metrics.csv` |
-| RF learning curve | `outputs/figures/rf_learning_curve.png`, `tables/rf_learning_curve.csv` |
-| RF confusion matrix | `outputs/figures/confusion_matrix_rf.png` |
-| Model comparison | `outputs/tables/rf_comparison.csv`, `figures/rf_comparison_bars.png` |
-| RF train efficiency | `outputs/tables/rf_efficiency.csv` |
-| RF inference efficiency | `outputs/tables/rf_inference_efficiency.csv` |
-| MLP model (optional) | `outputs/models/mlp_binary.pt`, `scaler.joblib` |
-| MLP metrics / curves | `outputs/tables/mlp_*.csv`, `figures/learning_curves.png` |
-| Ablation table | `outputs/tables/ablation_comparison.csv` |
-
-### Milestone 3
-
-| Output | Location |
-| -------- | ---------- |
-| Robustness metrics | `outputs/tables/m3_robustness_metrics.csv` |
-| Failure cases | `outputs/tables/m3_failure_cases.csv` |
-| Robustness / confidence figures | `m3_robustness_curves.png`, `m3_confidence_hist.png` |
-| PSI + monitoring log | `m3_drift_psi.csv`, `m3_monitoring_log.csv` |
-| Drift dashboard | `m3_drift_dashboard.png` |
-| Adaptation metrics | `m3_adaptation_metrics.csv` |
-| Adapted model | `outputs/models/rf_adapted.joblib` |
-| Before/after figure | `m3_adaptation_before_after.png` |
+| Artefact | Milestone |
+|----------|-----------|
+| `class_distribution.*`, EDA plots, feature importance | M1 |
+| `rf_metrics.csv`, `rf_comparison.csv`, learning curves, confusion matrix | M2 |
+| `m3_robustness_metrics.csv`, `m3_drift_*.csv`, `m3_adaptation_metrics.csv` | M3 |
+| `m3_robustness_curves.png`, `m3_drift_dashboard.png`, `m3_adaptation_before_after.png` | M3 |
+| `m4_continual_metrics.csv`, `m4_continual_trajectory.png` | M4 |
+| `m4_active_learning_metrics.csv`, `m4_active_learning_curve.png` | M4 |
+| `demo_end_to_end_summary.csv`, `demo_end_to_end.png` | Final |
 
 ---
 
-## 8. Model and System Summary
+## 8. Design Summary
 
-| Item | Choice |
-| ------ | -------- |
-| Task | Binary classification (BENIGN vs Attack) |
-| Primary model | Random Forest (`n_estimators=100`, `max_depth=20`, seed 42) |
-| Why RF | Best test F1/precision on tabular CICIDS flows; simple CPU deploy |
-| Imbalance | Stratified splits; class-weight ablation |
-| Leakage controls | No IP/port/Flow ID features; scaler fit on train only (MLP); test used once |
-| Robustness | Strong in-distribution; brittle to heavy Gaussian noise → monitoring + abstention |
-| Monitoring | Schema, null rate, PSI; alert if mean PSI > 0.2 or null rate > 1% |
-| Adaptation | Full RF retrain on drift; versioned `joblib` artefacts |
+| Topic | Choice |
+|-------|--------|
+| Task | Binary flow classification (Benign vs Attack) |
+| Features | Numeric flow stats; **no** IP/port/Flow ID leakage |
+| Split | Stratified 80/20, seed 42; val held out inside training scripts |
+| Primary model | Random Forest |
+| Imbalance | Stratified metrics (F1, PR-AUC); class-weight ablation |
+| Monitoring | Schema, null rate, **PSI** (alert if mean PSI > 0.2) |
+| Continual learning | Experience **replay buffer + full RF retrain** |
+| HITL / AL | Abstain + tickets + drift validation; **margin** uncertainty sampling |
+| Deployment | Online CPU inference; offline retrain; versioned `joblib`; rollback |
 
-**Default RF hyperparameters:** `n_estimators=100`, `max_depth=20`, `random_state=42`.
+---
 
-**Split:** stratified 80% train / 20% test; 15% of train held out as validation inside training scripts.
+## 9. Reproducibility
+
+- Fixed seed `42`
+- Relative paths only (no absolute paths)
+- Test set reserved for final metrics
+- M3/M4 shifts are **synthetic stress tests** (documented in reports)
+- GitHub repo shared with the course POD
+
+---
+
+## 10. License / Data
+
+Course project code for INSE 6450.
+CICIDS2017 must be obtained from the CIC under their research terms.
